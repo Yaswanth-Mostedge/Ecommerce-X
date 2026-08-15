@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CommerceX | Create account</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<main class="auth-page">
+    <div class="auth-card">
+        <a class="brand center" th:href="@{/shop}">CommerceX</a>
+        <h1>Create your account</h1>
+        <p class="auth-subtitle">Shop faster and track every order.</p>
+        <div th:if="${error}" class="alert" th:text="${error}"></div>
+
+        <form method="post" th:action="@{/register}" th:object="${user}">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <input type="text" th:field="*{name}" placeholder="Full name" required>
+            <input type="email" th:field="*{email}" placeholder="Email" required>
+            <input type="password" th:field="*{password}" placeholder="Password (8+ characters)" minlength="8" required>
+            <button type="submit">Create account</button>
+        </form>
+
+        <div class="auth-links">
+            <span>Already have an account?</span>
+            <a th:href="@{/login}">Sign in</a>
+        </div>
+    </div>
+</main>
+</body>
+</html>

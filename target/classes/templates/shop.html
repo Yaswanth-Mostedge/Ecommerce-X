@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CommerceX | Shop</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments :: navbar}"></div>
+
+<section class="hero-section">
+    <div class="hero-content">
+        <span class="hero-eyebrow">COMMERCE X</span>
+        <h1>Better products.<br>Better shopping.</h1>
+        <p>Discover products selected for quality, design and everyday usefulness.</p>
+        <div class="hero-actions">
+            <a href="#products" class="btn btn-primary">Shop now</a>
+            <a th:href="@{/cart}" class="btn btn-secondary">View cart</a>
+        </div>
+    </div>
+    <div class="hero-glow"></div>
+</section>
+
+<main class="shop-section" id="products">
+    <div class="shop-top">
+        <div>
+            <span class="section-label">COLLECTION</span>
+            <h2>Featured products</h2>
+            <p>Find something you'll actually enjoy using.</p>
+        </div>
+        <div class="product-count">
+            <span th:text="${#lists.size(products)}">0</span> products
+        </div>
+    </div>
+
+    <div class="filter-bar">
+        <form th:action="@{/shop}" method="get" class="filter-form">
+            <input type="hidden" name="q" th:value="${q}">
+            <select name="category">
+                <option value="">All categories</option>
+                <option th:each="c : ${categories}" th:value="${c}" th:text="${c}" th:selected="${c == category}"></option>
+            </select>
+            <select name="sort">
+                <option value="">Recommended</option>
+                <option value="low" th:selected="${sort == 'low'}">Price: Low to High</option>
+                <option value="high" th:selected="${sort == 'high'}">Price: High to Low</option>
+                <option value="rating" th:selected="${sort == 'rating'}">Top Rated</option>
+            </select>
+            <button type="submit" class="filter-button">Apply</button>
+        </form>
+        <div class="results-text" th:if="${q != null and !q.isEmpty()}">
+            Results for <strong th:text="${q}">search</strong>
+        </div>
+    </div>
+
+    <div class="product-grid" th:if="${products != null and !products.isEmpty()}">
+        <article class="product-card" th:each="p : ${products}">
+            <a th:href="@{/product/{id}(id=${p.id})}" class="product-image">
+                <img th:src="${p.imageUrl}" th:alt="${p.name}" loading="lazy">
+                <span class="sale-badge"
+                      th:if="${p.discountPercent != null and p.discountPercent > 0}"
+                      th:text="${#numbers.formatDecimal(p.discountPercent,1,0) + '% OFF'}"></span>
+            </a>
+
+            <div class="product-body">
+                <div class="product-meta">
+                    <span th:text="${p.brand}">Brand</span>
+                    <span class="dot">·</span>
+                    <span th:text="${p.category}">Category</span>
+                </div>
+
+                <a th:href="@{/product/{id}(id=${p.id})}" class="product-name" th:text="${p.name}">Product</a>
+                <p class="product-description" th:text="${p.description}">Description</p>
+
+                <div class="rating-row">
+                    <span class="stars">★</span>
+                    <span th:text="${p.rating}">4.5</span>
+                    <span class="rating-text">rating</span>
+                </div>
+
+                <div class="price-row">
+                    <span class="current-price"
+                          th:text="${'₹' + #numbers.formatDecimal(p.salePrice,1,2)}">₹0.00</span>
+                    <del th:if="${p.discountPercent != null and p.discountPercent > 0}"
+                         th:text="${'₹' + #numbers.formatDecimal(p.price,1,2)}">₹0.00</del>
+                </div>
+
+                <div class="stock-row">
+                    <span class="stock-available" th:if="${p.stock != null and p.stock > 0}">In stock</span>
+                    <span class="stock-low" th:if="${p.stock != null and p.stock > 0 and p.stock <= 5}">
+                        · Only <span th:text="${p.stock}">1</span> left
+                    </span>
+                    <span class="stock-out" th:if="${p.stock == null or p.stock <= 0}">Out of stock</span>
+                </div>
+
+                <form th:action="@{/cart/add/{id}(id=${p.id})}" method="post" class="cart-form">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <button type="submit" class="add-cart-button"
+                            th:disabled="${p.stock == null or p.stock <= 0}"
+                            th:text="${p.stock != null and p.stock > 0 ? 'Add to cart' : 'Out of stock'}">
+                    </button>
+                </form>
+            </div>
+        </article>
+    </div>
+
+    <div class="empty-state" th:if="${products == null or products.isEmpty()}">
+        <div class="empty-icon">🛍</div>
+        <h3>No products found</h3>
+        <p>Try another search or browse all products.</p>
+        <a th:href="@{/shop}" class="btn btn-primary">View all products</a>
+    </div>
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

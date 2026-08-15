@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+
+<header th:fragment="navbar" class="site-header">
+    <div class="nav-inner">
+        <a th:href="@{/shop}" class="brand">CommerceX</a>
+
+        <form th:action="@{/shop}" method="get" class="nav-search">
+            <input type="search" name="q" th:value="${q}" placeholder="Search products, brands and categories">
+            <button type="submit">Search</button>
+        </form>
+
+        <nav class="nav-links">
+            <a th:href="@{/shop}">Shop</a>
+            <a th:href="@{/cart}">Cart
+                <span class="cart-count" th:if="${session.cart != null}" th:text="${#maps.size(session.cart)}"></span>
+            </a>
+            <a th:href="@{/orders}" sec:authorize="isAuthenticated() and !hasRole('ADMIN')">Orders</a>
+            <a th:href="@{/admin}" sec:authorize="hasRole('ADMIN')">Admin</a>
+            <a th:href="@{/login}" sec:authorize="!isAuthenticated()">Sign In</a>
+
+            <form th:action="@{/logout}" method="post" class="logout-form" sec:authorize="isAuthenticated()">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <button type="submit" class="logout-button">Logout</button>
+            </form>
+        </nav>
+    </div>
+</header>
+
+<footer th:fragment="footer" class="site-footer">
+    <div class="footer-main">
+        <div class="footer-brand">
+            <a th:href="@{/shop}" class="footer-logo">CommerceX</a>
+            <p>Simple shopping. Thoughtful products. A modern commerce experience.</p>
+        </div>
+        <div class="footer-column">
+            <h4>Shop</h4>
+            <a th:href="@{/shop}">All Products</a>
+            <a th:href="@{/cart}">Cart</a>
+            <a th:href="@{/orders}" sec:authorize="isAuthenticated()">My Orders</a>
+        </div>
+        <div class="footer-column">
+            <h4>Account</h4>
+            <a th:href="@{/login}" sec:authorize="!isAuthenticated()">Sign In</a>
+            <a th:href="@{/register}" sec:authorize="!isAuthenticated()">Create Account</a>
+            <a th:href="@{/forgot-password}">Forgot Password</a>
+        </div>
+        <div class="footer-column">
+            <h4>CommerceX</h4>
+            <a th:href="@{/shop}">Support</a>
+            <a th:href="@{/shop}">Privacy</a>
+            <a th:href="@{/shop}">Terms</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <span>© 2026 CommerceX. All rights reserved.</span>
+        <span>Secure checkout · Fast delivery · Easy returns</span>
+    </div>
+</footer>
+</body>
+</html>
