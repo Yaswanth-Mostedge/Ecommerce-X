@@ -1119,6 +1119,13 @@ main{min-height:calc(100vh - 160px)}
 .auth-subtitle{color:#777}
 .auth-card form input{width:100%;height:46px;border:1px solid #ddd;border-radius:10px;padding:0 12px;margin:7px 0}
 .auth-card form button{width:100%;height:46px;margin-top:8px;border:0;border-radius:10px;background:#111;color:#fff;font-weight:700;cursor:pointer}
+.password-field{position:relative}
+.password-field input{padding-right:44px!important}
+.auth-card form .toggle-password{position:absolute;top:50%;right:6px;transform:translateY(-50%);width:36px;height:36px;margin:0;border:0;background:transparent;color:#888;display:grid;place-items:center;cursor:pointer;border-radius:8px;font-weight:400}
+.auth-card form .toggle-password:hover{color:#333;background:#f2f2f4}
+.toggle-password .icon-eye-off{display:none}
+.toggle-password.is-visible .icon-eye{display:none}
+.toggle-password.is-visible .icon-eye-off{display:block}
 .auth-links{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:18px;font-size:13px;color:#666}
 .dev-link{background:#f7f7f8;border:1px solid #e8e8ec;border-radius:12px;padding:12px;margin:14px 0;word-break:break-word;font-size:12px}
 .center{text-align:center}

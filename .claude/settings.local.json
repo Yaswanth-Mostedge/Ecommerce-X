@@ -33,7 +33,9 @@
       "Bash(unzip -l CommerceX-final.zip)",
       "Bash(awk '{print $4}')",
       "Bash(grep -E \"^CommerceX/[^/]*$\")",
-      "Bash(grep -cE \"\\\\.java$|\\\\.html$|\\\\.css$\")"
+      "Bash(grep -cE \"\\\\.java$|\\\\.html$|\\\\.css$\")",
+      "Bash(mvn -q -o compile)",
+      "Bash(open /private/tmp/claude-502/-Users-yaswanthmohanvinnakota-Downloads-CommerceX/2d4ede36-1ee5-482b-84b4-75e5286d47d4/scratchpad/preview.html)"
     ]
   }
 }
