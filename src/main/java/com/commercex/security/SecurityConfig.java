@@ -48,7 +48,7 @@ public class SecurityConfig {
                     "/login", "/register",
                     "/admin/login",
                     "/forgot-password", "/reset-password",
-                    "/css/**", "/js/**", "/images/**", "/favicon.ico"
+                    "/css/**", "/js/**", "/images/**", "/uploads/**", "/favicon.ico"
                 ).permitAll()
 
                 .requestMatchers("/admin/**").hasRole("ADMIN")

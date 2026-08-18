@@ -20,7 +20,7 @@
             <input type="text" th:field="*{name}" placeholder="Full name" required>
             <input type="email" th:field="*{email}" placeholder="Email" required>
             <div class="password-field">
-                <input type="password" th:field="*{password}" placeholder="Password (8+ characters)" minlength="8" required>
+                <input type="password" th:field="*{password}" placeholder="Password (6+ characters, letters and numbers)" minlength="6" required>
                 <button type="button" th:replace="fragments :: passwordToggle"></button>
             </div>
             <button type="submit">Create account</button>

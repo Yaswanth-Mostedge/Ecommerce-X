@@ -16,10 +16,21 @@ import lombok.RequiredArgsConstructor;
 @Controller
 @RequiredArgsConstructor
 public class AuthController {
-	
+
 	private final EmailVerificationService emailVerificationService;
 
     private final CommerceService commerceService;
+
+    private static final String PASSWORD_ERROR =
+            "Password must be at least 6 characters and include both letters and numbers.";
+
+    /** Alphanumeric, at least one letter and one digit, 6+ characters. */
+    private static boolean isValidPassword(String password) {
+        return password != null
+                && password.length() >= 6
+                && password.matches(".*[A-Za-z].*")
+                && password.matches(".*\\d.*");
+    }
 
     @GetMapping("/login")
     public String login() {
@@ -42,9 +53,8 @@ public class AuthController {
             @ModelAttribute("user") AppUser user,
             Model model) {
 
-        if (user.getPassword() == null ||
-                user.getPassword().length() < 8) {
-            model.addAttribute("error", "Password must be at least 8 characters.");
+        if (!isValidPassword(user.getPassword())) {
+            model.addAttribute("error", PASSWORD_ERROR);
             return "register";
         }
 
@@ -139,8 +149,8 @@ public class AuthController {
             @RequestParam String password,
             Model model) {
 
-        if (password == null || password.length() < 8) {
-            model.addAttribute("error", "Password must be at least 8 characters.");
+        if (!isValidPassword(password)) {
+            model.addAttribute("error", PASSWORD_ERROR);
             model.addAttribute("token", token);
             return "reset-password";
         }
