@@ -22,13 +22,43 @@
             <a th:href="@{/admin}" sec:authorize="hasRole('ADMIN')">Admin</a>
             <a th:href="@{/login}" sec:authorize="!isAuthenticated()">Sign In</a>
 
-            <form th:action="@{/logout}" method="post" class="logout-form" sec:authorize="isAuthenticated()">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                <button type="submit" class="logout-button">Logout</button>
-            </form>
+            <details class="profile-menu" sec:authorize="isAuthenticated()">
+                <summary class="profile-trigger">
+                    <span class="profile-avatar" th:text="${#strings.isEmpty(currentUserName)} ? 'A' : ${#strings.toUpperCase(#strings.substring(currentUserName,0,1))}">A</span>
+                    <span class="profile-name" th:text="${currentUserName}">Account</span>
+                </summary>
+                <div class="profile-dropdown">
+                    <form th:action="@{/logout}" method="post" class="logout-form">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <button type="submit" class="logout-button">Logout</button>
+                    </form>
+                </div>
+            </details>
         </nav>
     </div>
 </header>
+
+<aside th:fragment="adminSidebar(active)" class="admin-side">
+    <a class="brand" th:href="@{/admin}">CommerceX</a>
+    <a th:classappend="${active == 'dashboard'} ? 'active'" th:href="@{/admin}">Dashboard</a>
+    <a th:classappend="${active == 'products'} ? 'active'" th:href="@{/admin/products}">Products</a>
+    <a th:classappend="${active == 'orders'} ? 'active'" th:href="@{/admin/orders}">Orders</a>
+    <a th:classappend="${active == 'coupons'} ? 'active'" th:href="@{/admin/coupons}">Coupons</a>
+    <a th:href="@{/shop}">View store</a>
+
+    <details class="admin-profile">
+        <summary class="admin-profile-trigger">
+            <span class="admin-avatar" th:text="${#strings.isEmpty(currentUserName)} ? 'A' : ${#strings.toUpperCase(#strings.substring(currentUserName,0,1))}">A</span>
+            <span class="admin-profile-name" th:text="${currentUserName}">Admin</span>
+        </summary>
+        <div class="admin-profile-menu">
+            <form th:action="@{/logout}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <button class="logout-button" type="submit">Logout</button>
+            </form>
+        </div>
+    </details>
+</aside>
 
 <footer th:fragment="footer" class="site-footer">
     <div class="footer-main">

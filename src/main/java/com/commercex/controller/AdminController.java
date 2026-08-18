@@ -5,15 +5,22 @@ import com.commercex.repository.*;
 
 import jakarta.validation.Valid;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/admin")
@@ -28,15 +35,25 @@ public class AdminController {
     private final AppUserRepository users;
     private final CouponRepository coupons;
     private final ReviewRepository reviews;
+    private final BannerRepository banners;
+
+    @Value("${commercex.upload-dir}")
+    private String uploadDir;
 
     public AdminController(ProductRepository p, OrderRepository o,
                            AppUserRepository u, CouponRepository c,
-                           ReviewRepository r) {
+                           ReviewRepository r, BannerRepository b) {
         products = p;
         orders = o;
         users = u;
         coupons = c;
         reviews = r;
+        banners = b;
+    }
+
+    /** There's only ever one active banner; edits overwrite it in place. */
+    private Banner currentBanner() {
+        return banners.findAll().stream().findFirst().orElseGet(Banner::new);
     }
 
     /** Newest first, tolerating orders with no timestamp. */
@@ -55,7 +72,40 @@ public class AdminController {
         m.addAttribute("userCount", users.count());
         m.addAttribute("products", products.findAll());
         m.addAttribute("orders", newestFirst().stream().limit(10).toList());
+        m.addAttribute("banner", currentBanner());
         return "admin-dashboard";
+    }
+
+    @PostMapping("/banner")
+    String banner(@RequestParam("image") MultipartFile image,
+                  @RequestParam(required = false) String title) throws IOException {
+
+        String extension = switch (image.getContentType() == null ? "" : image.getContentType()) {
+            case "image/png" -> ".png";
+            case "image/webp" -> ".webp";
+            case "image/gif" -> ".gif";
+            case "image/jpeg" -> ".jpg";
+            default -> null;
+        };
+
+        // A non-image upload previously saved a broken file and left a stale <img> on the dashboard.
+        if (image.isEmpty() || extension == null) {
+            return "redirect:/admin?bannerError=true";
+        }
+
+        Path dir = Path.of(uploadDir, "banners");
+        Files.createDirectories(dir);
+
+        String filename = UUID.randomUUID() + extension;
+        image.transferTo(dir.resolve(filename));
+
+        Banner banner = currentBanner();
+        banner.setImageUrl("/uploads/banners/" + filename);
+        banner.setTitle(title == null || title.isBlank() ? null : title.trim());
+        banner.setUpdatedAt(LocalDateTime.now());
+        banners.save(banner);
+
+        return "redirect:/admin";
     }
 
     @GetMapping("/products")

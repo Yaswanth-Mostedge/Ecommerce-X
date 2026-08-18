@@ -191,6 +191,75 @@ select {
     font-size: 14px;
 }
 
+.profile-menu {
+    position: relative;
+}
+
+.profile-trigger {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 20px;
+}
+
+.profile-trigger::-webkit-details-marker {
+    display: none;
+}
+
+.profile-trigger:hover {
+    background: rgba(255,255,255,.08);
+}
+
+.profile-avatar {
+    width: 26px;
+    height: 26px;
+    flex: none;
+    border-radius: 50%;
+    background: #fff;
+    color: #111;
+    display: grid;
+    place-items: center;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.profile-name {
+    font-size: 14px;
+    color: #fff;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.profile-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 160px;
+    background: #1a1a1d;
+    border: 1px solid #2a2a2e;
+    border-radius: 10px;
+    padding: 6px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.35);
+    z-index: 10;
+}
+
+.profile-dropdown .logout-button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 9px 12px;
+    border-radius: 8px;
+}
+
+.profile-dropdown .logout-button:hover {
+    background: #232326;
+}
+
 
 /* =========================================================
    HERO
@@ -1135,9 +1204,16 @@ main{min-height:calc(100vh - 160px)}
 .admin-side{background:#111;color:#fff;padding:24px 18px;display:flex;flex-direction:column;gap:6px}
 .admin-side a{color:#cfcfd2;padding:11px 12px;border-radius:10px}
 .admin-side a:hover,.admin-side a.active{background:#232326;color:#fff}
-.admin-side form{margin:0;margin-top:auto;padding-top:12px;border-top:1px solid #232326}
-.admin-side .logout-button{display:block;width:100%;text-align:left;font:inherit;color:#cfcfd2;padding:11px 12px;border-radius:10px}
-.admin-side .logout-button:hover{background:#232326;color:#fff}
+.admin-profile{margin:0;margin-top:auto;padding-top:12px;border-top:1px solid #232326;position:relative}
+.admin-profile-trigger{list-style:none;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;color:#fff}
+.admin-profile-trigger::-webkit-details-marker{display:none}
+.admin-profile-trigger:hover{background:#232326}
+.admin-avatar{width:28px;height:28px;flex:none;border-radius:50%;background:#fff;color:#111;display:grid;place-items:center;font-size:13px;font-weight:600}
+.admin-profile-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+.admin-profile-menu{position:absolute;bottom:calc(100% + 6px);left:0;right:0;background:#1a1a1d;border:1px solid #2a2a2e;border-radius:10px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.admin-profile-menu form{margin:0;padding:0;border:0}
+.admin-profile-menu .logout-button{display:block;width:100%;text-align:left;font:inherit;color:#cfcfd2;padding:9px 12px;border-radius:8px;background:none;border:0;cursor:pointer}
+.admin-profile-menu .logout-button:hover{background:#232326;color:#fff}
 .admin-main{padding:38px;max-width:1440px;width:100%}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:20px 0}
 .stats>div{background:#fff;border:1px solid #e8e8ec;border-radius:16px;padding:20px}
@@ -1150,6 +1226,10 @@ main{min-height:calc(100vh - 160px)}
 .admin-form input,.admin-form textarea{width:100%;padding:11px;border:1px solid #ddd;border-radius:9px}
 .admin-form textarea{min-height:90px;grid-column:1/-1}
 .small-input{width:80px;padding:7px;border:1px solid #ddd;border-radius:8px}
+.banner-preview{width:100%;max-height:220px;object-fit:cover;border-radius:14px;margin:6px 0 16px;display:block}
+.banner-form{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.banner-form input[type="text"]{flex:1;min-width:200px;padding:11px;border:1px solid #ddd;border-radius:9px}
+.banner-form input[type="file"]{flex:1;min-width:200px}
 .danger-text{border:0;background:none;color:#a51d2d;cursor:pointer}
 
 @media(max-width:1000px){
