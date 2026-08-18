@@ -10,12 +10,15 @@ import jakarta.servlet.http.HttpSession;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URI;
 import java.util.*;
 
 @Controller
@@ -95,20 +98,33 @@ public class CartController {
         return "cart";
     }
 
+    /**
+     * The shop grid and product page submit this in the background (fetch, with
+     * X-Requested-With set) so adding to cart doesn't navigate away; a plain form
+     * submit without that header still falls back to a full-page redirect.
+     */
     @PostMapping("/cart/add/{id}")
-    public String add(
+    public ResponseEntity<?> add(
             @PathVariable Long id,
             @RequestParam(defaultValue = "1") int qty,
+            @RequestHeader(value = "X-Requested-With", required = false) String requestedWith,
             HttpSession session) {
 
-        Product product =
-                products.findById(id).orElseThrow();
+        boolean ajax = "XMLHttpRequest".equals(requestedWith);
 
-        if (!product.isActive() ||
+        Product product =
+                products.findById(id).orElse(null);
+
+        if (product == null ||
+                !product.isActive() ||
                 product.getStock() == null ||
                 product.getStock() <= 0) {
 
-            return "redirect:/shop";
+            return ajax
+                    ? ResponseEntity.unprocessableEntity()
+                            .body(Map.of("error", "This item is out of stock."))
+                    : ResponseEntity.status(HttpStatus.FOUND)
+                            .location(URI.create("/shop")).build();
         }
 
         int safeQty =
@@ -128,7 +144,41 @@ public class CartController {
                 )
         );
 
-        return "redirect:/cart";
+        if (ajax) {
+            return ResponseEntity.ok(Map.of("count", cart.size(), "qty", cart.get(id)));
+        }
+
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create("/cart")).build();
+    }
+
+    /** Mirrors add() for the shop grid's quantity stepper: -1, removing the line at zero. */
+    @PostMapping("/cart/decrement/{id}")
+    public ResponseEntity<?> decrement(
+            @PathVariable Long id,
+            @RequestHeader(value = "X-Requested-With", required = false) String requestedWith,
+            HttpSession session) {
+
+        boolean ajax = "XMLHttpRequest".equals(requestedWith);
+
+        Map<Long, Integer> cart =
+                getCart(session);
+
+        int updated =
+                cart.getOrDefault(id, 0) - 1;
+
+        if (updated <= 0) {
+            cart.remove(id);
+        } else {
+            cart.put(id, updated);
+        }
+
+        if (ajax) {
+            return ResponseEntity.ok(Map.of("count", cart.size(), "qty", cart.getOrDefault(id, 0)));
+        }
+
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create("/cart")).build();
     }
 
     @PostMapping("/cart/update")

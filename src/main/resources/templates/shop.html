@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CommerceX | Shop</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script th:src="@{/js/app.js}" defer></script>
 </head>
 <body>
 <div th:replace="~{fragments :: navbar}"></div>
 
-<section class="hero-section">
+<section class="hero-section" th:classappend="${banner != null and !#strings.isEmpty(banner.imageUrl)} ? 'has-banner-image'" th:style="${banner != null and !#strings.isEmpty(banner.imageUrl)} ? ('background-image:url(' + ${banner.imageUrl} + ')')">
     <div class="hero-content">
-        <span class="hero-eyebrow">COMMERCE X</span>
+        <span class="hero-eyebrow" th:text="${banner != null and !#strings.isEmpty(banner.title)} ? ${banner.title} : 'COMMERCE X'">COMMERCE X</span>
         <h1>Better products.<br>Better shopping.</h1>
         <p>Discover products selected for quality, design and everyday usefulness.</p>
         <div class="hero-actions">
@@ -20,6 +21,7 @@
         </div>
     </div>
     <div class="hero-glow"></div>
+    <div th:replace="fragments :: heroBannerEdit"></div>
 </section>
 
 <main class="shop-section" id="products">
@@ -94,13 +96,31 @@
                     <span class="stock-out" th:if="${p.stock == null or p.stock <= 0}">Out of stock</span>
                 </div>
 
-                <form th:action="@{/cart/add/{id}(id=${p.id})}" method="post" class="cart-form">
-                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                    <button type="submit" class="add-cart-button"
-                            th:disabled="${p.stock == null or p.stock <= 0}"
-                            th:text="${p.stock != null and p.stock > 0 ? 'Add to cart' : 'Out of stock'}">
-                    </button>
-                </form>
+                <div class="cart-control">
+                    <form th:action="@{/cart/add/{id}(id=${p.id})}" method="post"
+                          class="cart-form"
+                          th:classappend="${session.cart != null and session.cart.containsKey(p.id)} ? 'is-hidden'">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <button type="submit" class="add-cart-button"
+                                th:disabled="${p.stock == null or p.stock <= 0}"
+                                th:text="${p.stock != null and p.stock > 0 ? 'Add to cart' : 'Out of stock'}">
+                        </button>
+                    </form>
+
+                    <div class="qty-stepper"
+                         th:classappend="${session.cart == null or !session.cart.containsKey(p.id)} ? 'is-hidden'"
+                         th:attr="data-product-id=${p.id},data-max=${p.stock}">
+                        <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+                        <button type="button" class="qty-btn qty-decrement" aria-label="Remove one">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        </button>
+                        <span class="qty-value" th:text="${session.cart != null and session.cart.containsKey(p.id)} ? ${session.cart.get(p.id)} : 0">0</span>
+                        <button type="button" class="qty-btn qty-increment" aria-label="Add one"
+                                th:disabled="${p.stock != null and session.cart != null and session.cart.containsKey(p.id) and session.cart.get(p.id) >= p.stock}">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        </button>
+                    </div>
+                </div>
             </div>
         </article>
     </div>
