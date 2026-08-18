@@ -20,19 +20,6 @@
     </div>
 
     <div class="panel">
-        <h2>Dashboard banner</h2>
-        <p class="muted">Swap the image below for seasonal sales (e.g. Diwali, Christmas, End-of-season).</p>
-        <div th:if="${param.bannerError}" class="alert">Choose an image file (PNG, JPG, GIF or WEBP) to upload.</div>
-        <img th:if="${banner.imageUrl}" class="banner-preview" th:src="@{${banner.imageUrl}}" th:alt="${banner.title} ?: 'Dashboard banner'">
-        <form th:action="@{/admin/banner}" method="post" enctype="multipart/form-data" class="banner-form">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-            <input type="text" name="title" placeholder="Banner label (optional)" th:value="${banner.title}">
-            <input type="file" name="image" accept="image/png,image/jpeg,image/gif,image/webp" required>
-            <button type="submit">Update banner</button>
-        </form>
-    </div>
-
-    <div class="panel">
         <h2>Recent orders</h2>
         <table class="table">
             <tr><th>ID</th><th>Customer</th><th>Status</th><th>Total</th></tr>

@@ -53,7 +53,7 @@ public class AdminController {
 
     /** There's only ever one active banner; edits overwrite it in place. */
     private Banner currentBanner() {
-        return banners.findAll().stream().findFirst().orElseGet(Banner::new);
+        return banners.findTopByOrderByIdAsc().orElseGet(Banner::new);
     }
 
     /** Newest first, tolerating orders with no timestamp. */
@@ -72,7 +72,6 @@ public class AdminController {
         m.addAttribute("userCount", users.count());
         m.addAttribute("products", products.findAll());
         m.addAttribute("orders", newestFirst().stream().limit(10).toList());
-        m.addAttribute("banner", currentBanner());
         return "admin-dashboard";
     }
 
@@ -88,9 +87,9 @@ public class AdminController {
             default -> null;
         };
 
-        // A non-image upload previously saved a broken file and left a stale <img> on the dashboard.
+        // A non-image upload previously saved a broken file and left a stale <img> on the storefront.
         if (image.isEmpty() || extension == null) {
-            return "redirect:/admin?bannerError=true";
+            return "redirect:/shop?bannerError=true";
         }
 
         Path dir = Path.of(uploadDir, "banners");
@@ -105,7 +104,7 @@ public class AdminController {
         banner.setUpdatedAt(LocalDateTime.now());
         banners.save(banner);
 
-        return "redirect:/admin";
+        return "redirect:/shop";
     }
 
     @GetMapping("/products")

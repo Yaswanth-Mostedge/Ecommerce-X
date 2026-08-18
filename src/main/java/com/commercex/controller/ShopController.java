@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.commercex.model.Product;
+import com.commercex.repository.BannerRepository;
 import com.commercex.repository.ProductRepository;
 import com.commercex.repository.ReviewRepository;
 import com.commercex.web.ProductNotFoundException;
@@ -24,6 +25,7 @@ public class ShopController {
 
     private final ProductRepository products;
     private final ReviewRepository reviews;
+    private final BannerRepository banners;
 
     @GetMapping({"/", "/shop"})
     public String shop(
@@ -145,6 +147,11 @@ public class ShopController {
         model.addAttribute(
                 "categories",
                 categories
+        );
+
+        model.addAttribute(
+                "banner",
+                banners.findTopByOrderByIdAsc().orElse(null)
         );
 
         return "shop";
