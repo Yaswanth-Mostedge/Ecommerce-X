@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: commercex
+  namespace: commercex
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: commercex
+  template:
+    metadata:
+      labels:
+        app: commercex
+    spec:
+      containers:
+        - name: commercex
+          image: 844669502065.dkr.ecr.us-east-1.amazonaws.com/dev:latest
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: commercex
+  namespace: commercex
+spec:
+  selector:
+    app: commercex
+  ports:
+    - port: 80
+      targetPort: 8080
+  type: ClusterIP
