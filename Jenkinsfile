@@ -1,16 +1,58 @@
 pipeline {
-    agent any
+    agent {
+        kubernetes {
+            yaml """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: maven
+    image: maven:3.9.9-eclipse-temurin-17
+    command: ['cat']
+    tty: true
+    resources:
+      requests: { cpu: 250m, memory: 512Mi }
+      limits: { cpu: 500m, memory: 768Mi }
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:debug
+    command: ['/busybox/cat']
+    tty: true
+    volumeMounts:
+    - name: docker-config
+      mountPath: /kaniko/.docker
+    resources:
+      requests: { cpu: 250m, memory: 512Mi }
+      limits: { cpu: 500m, memory: 768Mi }
+  - name: trivy
+    image: aquasec/trivy:latest
+    command: ['cat']
+    tty: true
+    resources:
+      requests: { cpu: 100m, memory: 256Mi }
+      limits: { cpu: 300m, memory: 512Mi }
+  - name: awscli
+    image: amazon/aws-cli:2.15.0
+    command: ['cat']
+    tty: true
+    volumeMounts:
+    - name: docker-config
+      mountPath: /kaniko/.docker
+  volumes:
+  - name: docker-config
+    emptyDir: {}
+"""
+        }
+    }
 
     options {
-    timeout(time: 30, unit: 'MINUTES')
-    disableConcurrentBuilds()
-    buildDiscarder(logRotator(numToKeepStr: '15'))
+        timeout(time: 30, unit: 'MINUTES')
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '15'))
     }
 
     environment {
         ECR_REGISTRY = "844669502065.dkr.ecr.us-east-1.amazonaws.com"
         ECR_REPO     = "dev"
-        IMAGE_TAG    = "${env.BUILD_NUMBER}-${env.GIT_COMMIT?.take(7) ?: 'unknown'}"
         SONAR_PROJECT_KEY = "Ecommerce-X"
     }
 
@@ -28,7 +70,9 @@ pipeline {
 
         stage('Build & Unit Tests') {
             steps {
-                sh 'mvn -B clean package'
+                container('maven') {
+                    sh 'mvn -B clean package'
+                }
             }
             post {
                 always {
@@ -40,14 +84,16 @@ pipeline {
 
         stage('Static Code Analysis') {
             steps {
-                withSonarQubeEnv('sonarqube') {
-                    sh """
-                        mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-                          -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-                          -Dsonar.projectName=${SONAR_PROJECT_KEY} \
-                          -Dsonar.host.url=\$SONAR_HOST_URL \
-                          -Dsonar.token=\$SONAR_AUTH_TOKEN
-                    """
+                container('maven') {
+                    withSonarQubeEnv('sonarqube') {
+                        sh """
+                            mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+                              -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+                              -Dsonar.projectName=${SONAR_PROJECT_KEY} \
+                              -Dsonar.host.url=\$SONAR_HOST_URL \
+                              -Dsonar.token=\$SONAR_AUTH_TOKEN
+                        """
+                    }
                 }
             }
         }
@@ -60,40 +106,36 @@ pipeline {
             }
         }
 
-        stage('Docker Build') {
+        stage('Prepare Registry Auth') {
             steps {
-                sh "docker build -t ${ECR_REGISTRY}/${ECR_REPO}:${IMAGE_TAG} -t ${ECR_REGISTRY}/${ECR_REPO}:latest ."
+                container('awscli') {
+                    sh """
+                        TOKEN=\$(aws ecr get-login-password --region us-east-1)
+                        AUTH=\$(echo -n "AWS:\$TOKEN" | base64 -w0)
+                        mkdir -p /kaniko/.docker
+                        echo "{\\"auths\\":{\\"${ECR_REGISTRY}\\":{\\"auth\\":\\"\$AUTH\\"}}}" > /kaniko/.docker/config.json
+                    """
+                }
+            }
+        }
+
+        stage('Build & Push Image (Kaniko)') {
+            steps {
+                container('kaniko') {
+                    sh """
+                        /kaniko/executor --context `pwd` \
+                          --destination=${ECR_REGISTRY}/${ECR_REPO}:${IMAGE_TAG} \
+                          --destination=${ECR_REGISTRY}/${ECR_REPO}:latest
+                    """
+                }
             }
         }
 
         stage('Container Vulnerability Scan') {
             steps {
-                sh """
-                    trivy image --exit-code 0 --severity HIGH,CRITICAL \
-                      --format template --template '@/usr/local/share/trivy/templates/html.tpl' \
-                      -o trivy-report.html ${ECR_REGISTRY}/${ECR_REPO}:${IMAGE_TAG}
-                """
-            }
-            post {
-                always {
-                    publishHTML(target: [
-                        reportDir: '.',
-                        reportFiles: 'trivy-report.html',
-                        reportName: 'Trivy Vulnerability Report',
-                        keepAll: true,
-                        alwaysLinkToLastBuild: true
-                    ])
+                container('trivy') {
+                    sh "trivy image --exit-code 0 --severity HIGH,CRITICAL ${ECR_REGISTRY}/${ECR_REPO}:${IMAGE_TAG}"
                 }
-            }
-        }
-
-        stage('Push to ECR') {
-            steps {
-                sh """
-                    aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${ECR_REGISTRY}
-                    docker push ${ECR_REGISTRY}/${ECR_REPO}:${IMAGE_TAG}
-                    docker push ${ECR_REGISTRY}/${ECR_REPO}:latest
-                """
             }
         }
 
