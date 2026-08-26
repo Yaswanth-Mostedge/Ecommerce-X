@@ -76,7 +76,6 @@ spec:
             }
             post {
                 always {
-                    junit testResults: 'target/surefire-reports/*.xml', allowEmptyResults: true
                     archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
                 }
             }
@@ -161,9 +160,6 @@ spec:
         }
         failure {
             echo "Pipeline failed at stage: ${env.STAGE_NAME}"
-        }
-        always {
-            cleanWs()
         }
     }
 }
