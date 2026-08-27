@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: commercex
-          image: 844669502065.dkr.ecr.us-east-1.amazonaws.com/dev:latest
+          image: 844669502065.dkr.ecr.us-east-1.amazonaws.com/dev:fb0fe5d
           ports:
             - containerPort: 8080
           readinessProbe:
