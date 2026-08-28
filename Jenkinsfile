@@ -133,7 +133,13 @@ spec:
         stage('Container Vulnerability Scan') {
             steps {
                 container('trivy') {
-                    sh "trivy image --exit-code 0 --severity HIGH,CRITICAL ${ECR_REGISTRY}/${ECR_REPO}:${IMAGE_TAG}"
+                    sh "trivy image --exit-code 0 --severity HIGH,CRITICAL --format json --output trivy-report.json ${ECR_REGISTRY}/${ECR_REPO}:${IMAGE_TAG}"
+                }
+                recordIssues tools: [trivy(pattern: 'trivy-report.json')]
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'trivy-report.json', allowEmptyArchive: true
                 }
             }
         }
