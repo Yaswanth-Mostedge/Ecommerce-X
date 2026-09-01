@@ -17,6 +17,8 @@ import com.commercex.repository.ProductRepository;
 @Configuration
 public class DataInitializer {
 
+    private static final String CATEGORY_SPORTS = "Sports";
+
     @Bean
     CommandLineRunner init(
             AppUserRepository users,
@@ -281,7 +283,7 @@ public class DataInitializer {
                                 .description("FIFA-quality stitched soccer ball with textured grip panels for consistent flight and control.")
                                 .price(new BigDecimal("1499.00"))
                                 .discountPercent(new BigDecimal("12"))
-                                .category("Sports")
+                                .category(CATEGORY_SPORTS)
                                 .brand("CommerceX Sports")
                                 .imageUrl("https://images.unsplash.com/photo-1614632537190-23e4146777db?w=1200")
                                 .stock(60)
@@ -297,7 +299,7 @@ public class DataInitializer {
                                 .description("Indoor/outdoor composite leather basketball with deep channel grooves for a locked-in grip.")
                                 .price(new BigDecimal("1799.00"))
                                 .discountPercent(new BigDecimal("10"))
-                                .category("Sports")
+                                .category(CATEGORY_SPORTS)
                                 .brand("CommerceX Sports")
                                 .imageUrl("https://images.unsplash.com/photo-1519861531473-9200262188bf?w=1200")
                                 .stock(45)
@@ -313,7 +315,7 @@ public class DataInitializer {
                                 .description("Space-saving adjustable dumbbell pair with quick dial-a-weight changes from 5 to 25 kg.")
                                 .price(new BigDecimal("8999.00"))
                                 .discountPercent(new BigDecimal("15"))
-                                .category("Sports")
+                                .category(CATEGORY_SPORTS)
                                 .brand("PowerCore")
                                 .imageUrl("https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1200")
                                 .stock(20)
@@ -329,7 +331,7 @@ public class DataInitializer {
                                 .description("Extra-thick 8mm eco-friendly yoga mat with a non-slip textured surface for stability in every pose.")
                                 .price(new BigDecimal("1299.00"))
                                 .discountPercent(new BigDecimal("8"))
-                                .category("Sports")
+                                .category(CATEGORY_SPORTS)
                                 .brand("FlexFit")
                                 .imageUrl("https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=1200")
                                 .stock(70)
@@ -345,7 +347,7 @@ public class DataInitializer {
                                 .description("Lightweight breathable running shoes with responsive cushioning built for long-distance training.")
                                 .price(new BigDecimal("3999.00"))
                                 .discountPercent(new BigDecimal("18"))
-                                .category("Sports")
+                                .category(CATEGORY_SPORTS)
                                 .brand("TrailBlazer")
                                 .imageUrl("https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=1200")
                                 .stock(35)
