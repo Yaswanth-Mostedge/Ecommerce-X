@@ -55,7 +55,7 @@ public class DataInitializer {
             // SAMPLE PRODUCTS
             // =====================================================
 
-            if (products.count() < 12) {
+            if (products.count() < 17) {
 
                 Product headphones =
                         Product.builder()
@@ -272,6 +272,88 @@ public class DataInitializer {
                                 .build();
 
                 products.save(camera);
+
+                // ---------------- SPORTS ----------------
+
+                Product soccerBall =
+                        Product.builder()
+                                .name("Strike Pro Match Football")
+                                .description("FIFA-quality stitched soccer ball with textured grip panels for consistent flight and control.")
+                                .price(new BigDecimal("1499.00"))
+                                .discountPercent(new BigDecimal("12"))
+                                .category("Sports")
+                                .brand("CommerceX Sports")
+                                .imageUrl("https://images.unsplash.com/photo-1614632537190-23e4146777db?w=1200")
+                                .stock(60)
+                                .rating(4.6)
+                                .active(true)
+                                .build();
+
+                products.save(soccerBall);
+
+                Product basketball =
+                        Product.builder()
+                                .name("Court King Basketball")
+                                .description("Indoor/outdoor composite leather basketball with deep channel grooves for a locked-in grip.")
+                                .price(new BigDecimal("1799.00"))
+                                .discountPercent(new BigDecimal("10"))
+                                .category("Sports")
+                                .brand("CommerceX Sports")
+                                .imageUrl("https://images.unsplash.com/photo-1519861531473-9200262188bf?w=1200")
+                                .stock(45)
+                                .rating(4.7)
+                                .active(true)
+                                .build();
+
+                products.save(basketball);
+
+                Product dumbbellSet =
+                        Product.builder()
+                                .name("PowerCore Adjustable Dumbbell Set")
+                                .description("Space-saving adjustable dumbbell pair with quick dial-a-weight changes from 5 to 25 kg.")
+                                .price(new BigDecimal("8999.00"))
+                                .discountPercent(new BigDecimal("15"))
+                                .category("Sports")
+                                .brand("PowerCore")
+                                .imageUrl("https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1200")
+                                .stock(20)
+                                .rating(4.8)
+                                .active(true)
+                                .build();
+
+                products.save(dumbbellSet);
+
+                Product yogaMat =
+                        Product.builder()
+                                .name("FlexFit Non-Slip Yoga Mat")
+                                .description("Extra-thick 8mm eco-friendly yoga mat with a non-slip textured surface for stability in every pose.")
+                                .price(new BigDecimal("1299.00"))
+                                .discountPercent(new BigDecimal("8"))
+                                .category("Sports")
+                                .brand("FlexFit")
+                                .imageUrl("https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=1200")
+                                .stock(70)
+                                .rating(4.5)
+                                .active(true)
+                                .build();
+
+                products.save(yogaMat);
+
+                Product runningShoes =
+                        Product.builder()
+                                .name("TrailBlazer Running Shoes")
+                                .description("Lightweight breathable running shoes with responsive cushioning built for long-distance training.")
+                                .price(new BigDecimal("3999.00"))
+                                .discountPercent(new BigDecimal("18"))
+                                .category("Sports")
+                                .brand("TrailBlazer")
+                                .imageUrl("https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=1200")
+                                .stock(35)
+                                .rating(4.6)
+                                .active(true)
+                                .build();
+
+                products.save(runningShoes);
             }
 
 
